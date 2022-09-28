@@ -5,17 +5,11 @@ function deepEqual(firstValue, secondValue) {
         if (Object.getOwnPropertyNames(firstValue).length != Object.getOwnPropertyNames(secondValue).length) {
             return false;
         } else {
-                for (let property in firstValue) {
-                    if ( !property in secondValue ||
+                for (let property in firstValue, secondValue) {
+                    if ( firstValue.property != secondValue.property ||
                          !deepEqual( firstValue[property], secondValue[property]) ) {
                             return false;
                          }
-                }
-                for (let property in secondValue) {
-                    if ( !(property in firstValue) ||
-                         !deepEqual( firstValue[property], secondValue[property]) ) {
-                            return false;
-                    }
                 }
                 return true;
         }
