@@ -22,12 +22,12 @@ const box = {
     if (boxIsInitiallyClosed) {
       box.unlock();
     }
-      try {
-        body;
-      } finally {
-        if (boxIsInitiallyClosed) {
-          box.lock();
-        }
+    try {
+        body();
+    } finally {
+      if (boxIsInitiallyClosed) {
+        box.lock();
+      }
     }
   }
   
