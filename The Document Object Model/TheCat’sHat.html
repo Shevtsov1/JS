@@ -1,0 +1,30 @@
+
+<!-- Extend the cat animation defined earlier so that both the cat and his hat () orbit at opposite sides of the ellipse.
+
+Or make the hat circle around the cat. Or alter the animation in some other interesting way. -->
+
+<!doctype html>
+
+<style>body { min-height: 200px }</style>
+<img src="img/cat.png" id="cat" style="position: absolute">
+<img src="img/hat.png" id="hat" style="position: absolute; max-height: 300px">
+
+<script>
+  let cat = document.querySelector("#cat");
+  let hat = document.querySelector("#hat");
+
+  let angle = 0;
+  let lastTime = null;
+  function animate(time) {
+    if (lastTime != null) angle += (time - lastTime) * 0.001;
+    lastTime = time;
+    cat.style.top = (Math.sin(angle) * 40 + 40) + "px";
+    cat.style.left = (Math.cos(angle) * 400 + 400) + "px";
+
+   hat.style.bottom = (Math.sin(angle) * 40 + 40) + "px";
+   hat.style.left = (Math.cos(angle) * 450 + 450) + "px"; 
+
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+</script>
