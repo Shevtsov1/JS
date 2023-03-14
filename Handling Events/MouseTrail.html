@@ -1,0 +1,78 @@
+
+<!--  In this exercise, I want you to implement a mouse trail.
+      Use absolutely positioned <div> elements with a fixed size
+        and background color (refer to the code in the “Mouse Clicks” section for an example).
+      Create a bunch of such elements and, when the mouse moves,
+        display them in the wake of the mouse pointer. -->
+
+
+
+<!doctype html>
+
+<style>
+  .trail { /* className for the trail elements */
+    position: absolute;
+    height: 6px; width: 6px;
+    border-radius: 3px;
+    background: teal;
+  }
+  body {
+    height: 300px;
+  }
+</style>
+
+<body>
+  <script>
+
+    /**
+     * Array of pixels from trail.
+     * 
+     * @type {Number[]}
+     */
+    let pixels = [];
+    
+    /**
+     * Function that creates a trail elements at body and push it to array.
+     * 
+     * @param {Number} length Length of trail.
+     */
+    const trailCreator = function(length) {
+      for (let counter = 0; counter < length; counter++) {
+        let node = document.createElement('div');
+        node.className = 'trail';
+        document.body.appendChild(node);
+        pixels.push(node);
+      }
+    }
+    trailCreator(20);
+    
+    /**
+     * Current pixel in trail.
+     * 
+     * @type {Number}
+     */
+    let currentPixel = 0;
+    
+    /**
+     * Returns random color.
+     * 
+     * @return {String} Color hex code.
+     */
+    function getRandomColor () {
+      let hex = Math.floor(Math.random() * 0xFFFFFF);
+      return "#" + ("000000" + hex.toString(16)).substr(-6);
+    } 
+
+    /**
+     * Moves trail and change pixel's colors. 
+     */
+    window.addEventListener("mousemove", event => {
+      let trail = pixels[currentPixel];
+      trail.style.left = (event.pageX - 3) + "px";
+      trail.style.top = (event.pageY - 3) + "px";
+      trail.style.background = getRandomColor();
+      currentPixel = (currentPixel + 1) % pixels.length;
+    });
+
+  </script>
+  </body>

@@ -1,0 +1,40 @@
+
+<!-- Write a page that displays a balloon (using the balloon emoji, 🎈).
+  When you press the up arrow, it should inflate (grow) 10 percent,
+  and when you press the down arrow, it should deflate (shrink) 10 percent. -->
+ 
+<!doctype html>
+
+<p>🎈</p>
+
+<script>
+  let para = document.querySelector('p');
+  para.style.marginLeft = '40%';
+  para.style.marginTop = '20%';
+  let fontSize;
+
+  function setSize(newFontSize) {
+    fontSize = newFontSize;
+    para.style.fontSize = fontSize + 'px';
+  }
+
+  setSize(50);
+
+  function handleArrow(event) {
+    if (event.key == 'ArrowUp') {
+      if (fontSize > 200) {
+        para.textContent = '💥';
+        document.body.removeEventListener('keydown', handleArrow);
+      } else {
+        console.log('UP!')
+        setSize(fontSize * 1.1);
+        event.preventDefault();
+      }
+    } else if (event.key == 'ArrowDown') {
+      console.log('DOWN!')
+      setSize(fontSize * 0.9);
+      event.preventDefault();
+    }
+  }
+  document.body.addEventListener('keydown', handleArrow);
+</script>
