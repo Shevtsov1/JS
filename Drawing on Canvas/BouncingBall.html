@@ -1,0 +1,136 @@
+<!-- Modify this program so that the name of each category is shown next to the slice that represents it.
+Try to find a pleasing-looking way to automatically position this text
+  that would work for other data sets as well.
+You may assume that categories are big enough to leave ample room for their labels. -->
+
+<!doctype html>
+
+<canvas width="400" height="400"></canvas>
+<script>
+ 
+  /**
+   * Canvas 2D context.
+   * 
+   * @type {Object}
+   */
+  let cx = document.querySelector("canvas").getContext("2d");
+
+  /**
+   * The color of the box.
+   *
+   * @type {string}
+   */
+  let boxColor = 'Blue';
+
+   /**
+   * The color of the ball.
+   *
+   * @type {string}
+   */
+  let ballColor = 'Green';
+
+  /**
+   * The size of the ball.
+   *
+   * @type {number}
+   */
+  let ballSize = 20;
+
+  /**
+   * The speed of the ball.
+   *
+   * @type {number}
+   */
+  let ballSpeed = 100;
+
+   /**
+   * The x-coordinate of the ball.
+   *
+   * @type {number}
+   */
+  let ballX = 50;
+
+  /**
+   * The y-coordinate of the ball.
+   *
+   * @type {number}
+   */
+  let ballY = 50;
+
+  /**
+   * The x-velocity of the ball.
+   *
+   * @type {number}
+   */
+  let ballVX = ballSpeed * 2;
+
+  /**
+   * The y-velocity of the ball.
+   *
+   * @type {number}
+   */
+  let ballVY = ballSpeed;
+
+  /**
+   * The time of the last frame.
+   *
+   * @type {?number}
+   */
+  let lastTime = null;
+
+  /**
+   * Draws the box.
+   */
+  function drawBox() {
+    cx.strokeStyle = boxColor;
+    cx.lineWidth = 5;
+    cx.strokeRect(0, 0, cx.canvas.width, cx.canvas.height);
+  }
+
+   /**
+   * Draws the ball.
+   */
+  function drawBall() {
+    cx.beginPath();
+    cx.arc(ballX, ballY, ballSize/2, 0, 7);
+    cx.fillStyle = ballColor;
+    cx.fill();
+  }
+
+  /**
+   * Updates the animation.
+   *
+   * @param {Number} step The amount of time that has passed since the last frame.
+   */
+  function updateAnimation(step) {
+    cx.clearRect(0, 0, cx.canvas.width, cx.canvas.height);
+    drawBox();
+    ballX += ballVX * step;
+    ballY += ballVY * step;
+
+    if (ballX < ballSize/2 || ballX > cx.canvas.width - ballSize/2) {
+      ballVX = -ballVX;
+    }
+
+    if (ballY < ballSize/2 || ballY > cx.canvas.height - ballSize/2) {
+      ballVY = -ballVY;
+    }
+
+    drawBall();
+  }
+
+  /**
+   * The main animation loop.
+   *
+   * @param {Number} time The current time.
+   */
+  function frame(time) {
+    if (lastTime != null) {
+      updateAnimation(Math.min(100, time - lastTime) / 1000);
+    }
+    lastTime = time;
+    requestAnimationFrame(frame);
+  }
+  
+  requestAnimationFrame(frame);
+</script>
