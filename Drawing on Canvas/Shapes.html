@@ -1,0 +1,157 @@
+<!-- Write a program that draws the following shapes on a canvas:
+
+  1. A trapezoid (a rectangle that is wider on one side)
+  2. A red diamond (a rectangle rotated 45 degrees or ¼π radians)
+  3. A zigzagging line
+  4. A spiral made up of 100 straight line segments
+  5. A yellow star -->
+
+<canvas width="600" height="200"></canvas>
+<script>
+  
+  /**
+   * Canvas 2D context.
+   * 
+   * @type {Object}
+   */
+  let cx = document.querySelector("canvas").getContext("2d");
+  
+  /**
+   * Rotates the context by a specified angle. Moves to the specified point, rotates context by a specified angle and moves back to previous point.
+   * 
+   * @param {Object} context Drawing context on the canvas.
+   * @param {Number} x Distance to move in the horizontal direction.
+   * @param {Number} y Distance to move in the vertical direction.
+   * @param {Number} angle The rotation angle, clockwise in radians.
+   */
+  function rotateAgainstCenter(context, x, y, angle) {
+  context.translate(x, y);
+  context.rotate(angle);
+  context.translate(-x, -y);
+  } 
+
+  /**
+   * Draws trapezoid.
+   * 
+   * @param {Number} centerX Center of trapezoid in the horizontal direction.
+   * @param {Number} centerY Center of trapezoid in the vertical direction.
+   * @param {Number} height Height of trapezoid.
+   * @param {Number} topWidth Top width of trapezoid.
+   * @param {Number} bottomWidth Bottom width of trapezoid.
+   */
+  function drawTrapezoid (centerX, centerY, height, topWidth, bottomWidth) {
+    let topLeftPointX = centerX - topWidth / 2;
+    let topRightPointX = centerX + topWidth / 2;
+    let topPointsY = centerY - height / 2
+    let bottomLeftPointX = centerX - bottomWidth / 2;
+    let bottomRightPointX = centerX + bottomWidth / 2;
+    let bottomPointsY = centerY + height / 2;
+    cx.beginPath();
+    cx.moveTo(topLeftPointX, topPointsY);
+    cx.lineTo(topRightPointX, topPointsY);
+    cx.lineTo(bottomRightPointX, bottomPointsY);
+    cx.lineTo(bottomLeftPointX, bottomPointsY);
+    cx.lineTo(topLeftPointX, topPointsY);
+    cx.stroke();
+  }
+  
+  /**
+   * Draws diamond.
+   * 
+   * @param {Number} centerX Center of diamond in the horizontal direction.
+   * @param {Number} centerY Center of diamond in the vertical direction.
+   * @param {Number} sideLength Length of diamond side.
+   * @param {Number} angle Angle to rotate.
+   * @param {String} color Diamond fill color.
+   */
+  function drawDiamond(centerX, centerY, sideLength, angle, color) {
+    rotateAgainstCenter(cx, centerX, centerY, angle);
+    cx.fillStyle = color;
+    cx.fillRect(centerX - sideLength / 2, centerY - sideLength / 2, sideLength, sideLength);
+    rotateAgainstCenter(cx, centerX, centerY, -angle);
+  }
+
+  /**
+   * Draws zigzagging line.
+   * 
+   * @param {Number} leftX Left edge of the zigzag.
+   * @param {Number} rightX Right edge of the zigzag.
+   * @param {Number} y Starting point on the vertical direction.
+   * @param {Number} shiftY Vertical direction shift.
+   */
+  function drawZigzaggingLine(leftX, rigthX, y, shiftY) {
+    let newY = y + shiftY;
+    cx.beginPath();
+    cx.moveTo(leftX, y);
+    for (let i = 0; i <= 6; i++) {
+      cx.lineTo(rigthX,newY);
+      newY += shiftY;
+      cx.lineTo(leftX, newY);
+      newY += shiftY;
+    }
+    cx.stroke();
+  }
+
+  /**
+   * Draws spiral.
+   * 
+   * @param {Number} x Start point in the horizontal direction.
+   * @param {Number} y Start point in the vertical direction.
+   * @param {Number} width Width of spiral. 
+   * @param {Number} segments Number of segments of spiral.
+   */
+  function drawSpiral(x, y, width, segments) {
+    cx.beginPath();
+    cx.moveTo(x + width / 2, y + width / 2);
+    let increment = Math.pow(Math.PI, 2) / segments;
+    let angle = 0;
+    for (let i = 0; i < segments; i++) {
+      let points = [];
+      angle += increment;
+      points[0] = Math.cos(angle);
+      points[1] = Math.sin(angle);
+      angle += increment;
+      points[2] = Math.cos(angle);
+      points[3] = Math.sin(angle);
+      points = points.map(x => ((x * i) + width) / 2);
+      cx.lineTo(x + points[0], y + points[1]);
+      cx.lineTo(x + points[2], y + points[3]);
+    }
+    cx.stroke();
+  }
+
+  /**
+   * Draws star.
+   * 
+   * @param {Number} centerX Center of star in the horizontal direction.
+   * @param {Number} centerY Center of star in the vertical direction.
+   * @param {Number} points Number of star points.
+   * @param {Number} width Width of star.
+   * @param {String} color Color of star.
+   */  
+  function drawStar(centerX, centerY, points, width, color) {
+    let halfWidth = width / 2;
+    let increment = 2 * Math.PI / points;
+    let angle = 0;
+    cx.beginPath();
+    cx.moveTo(centerX, centerY);
+    for (let i = 0; i <= points; i++) {
+      angle += increment;
+      cx.quadraticCurveTo(centerX, centerY, centerX + Math.cos(angle) * halfWidth, centerY + Math.sin(angle) * halfWidth);
+    }
+    cx.fillStyle = color;
+    cx.fill();
+  }
+
+
+  drawTrapezoid(50, 50, 50, 70, 100);
+
+  drawDiamond(150, 50, 50, Math.PI / 4, 'red');
+
+  drawZigzaggingLine(200,260, 10, 5);
+
+  drawSpiral(300, 20, 50, 100);
+
+  drawStar(450, 50, 8, 100, 'orange');
+
+</script>

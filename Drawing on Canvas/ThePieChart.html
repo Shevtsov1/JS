@@ -1,0 +1,87 @@
+<!-- Earlier in the chapter, we saw an example program that drew a pie chart.
+Modify this program so that the name of each category is shown next to the slice that represents it.
+Try to find a pleasing-looking way to automatically position this text that would work for other data sets as well.
+You may assume that categories are big enough to leave ample room for their labels. -->
+
+<!doctype html>
+
+<canvas width="600" height="300"></canvas>
+<script>
+
+ /**
+   * Array of vote results.
+   * 
+   * @type {Array<object>}
+   * @property {string} name The name of the category.
+   * @property {number} count The number of votes for the category.
+   * @property {string} color The color to use for the category's slice in the pie chart.
+   */
+  let results = [
+  {name: "Satisfied", count: 1043, color: "lightblue"},
+  {name: "Neutral", count: 563, color: "lightgreen"},
+  {name: "Unsatisfied", count: 510, color: "pink"},
+  {name: "No comment", count: 175, color: "silver"}
+  ];
+
+  /**
+   * Canvas 2D context.
+   * 
+   * @type {Object}
+   */
+  let cx = document.querySelector("canvas").getContext("2d");
+
+ /**
+   * The total number of votes.
+   * 
+   * @type {number}
+   */
+  let total = results.reduce((sum, {count}) => sum + count, 0);
+
+   /**
+   * The current angle of the pie chart slice being drawn.
+   * 
+   * @type {number}
+   */ 
+  let currentAngle = -0.5 * Math.PI;
+
+  /**
+   * The x-coordinate of the center of the pie chart.
+   * 
+   * @type {number}
+   */
+  let centerX = 300;
+
+  /**
+   * The y-coordinate of the center of the pie chart.
+   * 
+   * @type {number}
+   */
+  let centerY = 150;
+
+  /**
+   * The radius of the pie chart.
+   * 
+   * @type {number}
+   */
+  let radius = 100;
+
+  for (let result of results) {
+    let sliceAngle = (result.count / total) * 2 * Math.PI;
+    let middleAngle = currentAngle + 0.5 * sliceAngle;
+    let textX = Math.cos(middleAngle) * 150 + centerX;
+    let textY = Math.sin(middleAngle) * 120 + centerY;
+
+    cx.beginPath();
+    cx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+    currentAngle += sliceAngle;
+    cx.lineTo(centerX, centerY);
+    cx.fillStyle = result.color;
+    cx.fill();
+
+    cx.font = "14px sans-serif";
+    cx.fillStyle = "black";
+    cx.textAlign = "center";
+    cx.textBaseline = "middle";
+    cx.fillText(result.name, textX, textY); 
+  }
+</script>
