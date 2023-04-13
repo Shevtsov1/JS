@@ -1,0 +1,199 @@
+<!-- Conway’s Game of Life is a simple simulation that creates artificial “life” on a grid,
+   each cell of which is either alive or not. Each generation (turn), the following rules are applied:
+
+1.Any live cell with fewer than two or more than three live neighbors dies.
+
+2.Any live cell with two or three live neighbors lives on to the next generation.
+
+3.Any dead cell with exactly three live neighbors becomes a live cell.
+
+A neighbor is defined as any adjacent cell, including diagonally adjacent ones.
+
+Note that these rules are applied to the whole grid at once, not one square at a time.
+ That means the counting of neighbors is based on the situation at the start of the generation,
+  and changes happening to neighbor cells during this generation should not influence the new state of a given cell.
+
+Implement this game using whichever data structure you find appropriate.
+ Use Math.random to populate the grid with a random pattern initially.
+  Display it as a grid of checkbox fields, with a button next to it to advance to the next generation.
+   When the user checks or unchecks the checkboxes,
+    their changes should be included when computing the next generation. -->
+<!doctype html>
+<html lang="en">
+<body>
+  <div id="grid"></div>
+  <label for="rows">Rows:</label>
+  <input id="rows" type="number" name="rows" value="20">
+  <label for="columns">Columns:</label>
+  <input id="columns" type="number" name="columns" value="20">
+  <button id="resize">Create grid</button>
+  <br>
+  <div class="population" style="margin-top: 10px;"></div>
+  <label for="density">Density:</label>
+  <input id="density" type="number" name="density" value="0.3">
+  <button id="life">New life</button>
+  <button id="next">Next population</button>
+  <label for="interval">Time interval:</label>
+  <input id="interval" type="number" name="interval" value="400">
+  <button id="run">Auto</button>
+
+  <script>
+
+    /**
+      The value of grid width.
+      @type {number}
+    */
+    let width = document.querySelector("#columns").value;
+
+    /**
+      The value of grid height.  
+      @type {number}
+    */
+    let height = document.querySelector("#rows").value;
+
+    /**
+      Array of all checkboxes in the grid.
+      @type {HTMLInputElement[]}
+    */
+    let checkboxes = [];
+
+    /**
+      Creates a new grid of checkboxes with the specified width and height.
+      @param {number} width - The width of the grid.
+      @param {number} height - The height of the grid.
+    */
+    function createGrid(width, height){
+      let gridNode = document.querySelector("#grid");
+      // Remove all child nodes from the grid.
+      while (gridNode.hasChildNodes()) {
+        gridNode.removeChild(gridNode.lastChild);
+      }
+      // Create a checkbox for each cell in the grid.
+      for (let x = 0; x < width; x++) {
+        for (let y = 0; y < height; y++) {
+            let box = document.createElement("input");
+            box.type = "checkbox";
+            gridNode.appendChild(box);
+            checkboxes.push(box);
+          }
+        gridNode.appendChild(document.createElement("br"));
+      }
+    }
+
+    // Event listener for the "Create grid" button.
+    document.querySelector("#resize").addEventListener("click", () => {
+      width = document.querySelector("#columns").value;
+      height = document.querySelector("#rows").value;
+      createGrid(width, height);});
+
+    /**
+      Returns an array representing a random grid of cells.
+      @returns {boolean[]} - An array of booleans representing the state of each cell in the grid.
+    */
+    function randomGrid() {
+      let result = [];
+      for (let i = 0; i < width * height; i++) {
+        result.push(Math.random() < document.querySelector("#density").value);
+      }
+      return result;
+    }
+
+    /**
+      Fills the grid with a random population.
+    */
+    function createLife() {
+      try {
+        checkboxesFromGrid(randomGrid());
+      } catch(e) {
+        alert("Create grid before!");
+      }
+      
+    }
+
+    // Event listener for the "New life" button.
+    document.querySelector("#life").addEventListener("click", () => {createLife()});
+
+    /**
+      Returns an array representing the state of each cell in the grid.
+      @returns {boolean[]} - An array of booleans representing the state of each cell in the grid.
+    */
+    function gridFromCheckboxes() {
+      return checkboxes.map(box => box.checked);
+    }
+    /**
+      Sets the state of each cell in the grid based on an array of booleans.
+      @param {boolean[]} grid - An array of booleans representing the state of each cell in the grid.
+    */
+    function checkboxesFromGrid(grid) {
+      grid.forEach((value, i) => checkboxes[i].checked = value);
+    }
+
+    /**
+      Returns the number of neighboring cells that are alive.
+      @param {boolean[]} grid - An array of booleans representing the state of each cell in the grid.
+      @param {number} x - The x-coordinate of the cell.
+      @param {number} y - The y-coordinate of the cell.
+      @returns {number} - The number of neighboring cells that are alive.
+    */
+    function countNeighbors(grid, x, y) {
+      let count = 0;
+      for (let y1 = Math.max(0, y - 1); y1 <= Math.min(height - 1, y + 1); y1++) {
+        for (let x1 = Math.max(0, x - 1); x1 <= Math.min(width - 1, x + 1); x1++) {
+          if ((x1 != x || y1 != y) && grid[x1 + y1 * width]) {
+            count++;
+          }
+        }
+      }
+      return count;
+    }
+
+    /**
+      Generates the next population of the grid.
+      @param {boolean[]} grid - An array of booleans representing the state of each cell in the grid.
+      @returns {boolean[]} - The new population of the grid.
+    */
+    function nextPopulation(grid) {
+      let newGrid = new Array(width * height);
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          let neighbors = countNeighbors(grid, x, y);
+          let offset = x + y * width;
+          if (neighbors < 2 || neighbors > 3) {
+            newGrid[offset] = false;
+          } else if (neighbors == 2) {
+            newGrid[offset] = grid[offset];
+          } else {
+            newGrid[offset] = true;
+          }
+        }
+      }
+      return newGrid;
+    }
+
+    /**
+      Advances the grid to the next generation and updates the checkboxes.
+    */
+    function turn() {
+      checkboxesFromGrid(nextPopulation(gridFromCheckboxes()));
+    }
+
+    // Add an event listener to the "Next" button to advance the grid one generation.
+    document.querySelector("#next").addEventListener("click", turn);
+
+    /**
+     Shows state of auto mode.
+     @type {boolean} - state of auto mode.
+    */
+    let running = null;
+
+    // Add an event listener to the "Run" button to continuously advance the grid
+    document.querySelector("#run").addEventListener("click", () => {
+      if (running) {
+        clearInterval(running);
+        running = null;
+      } else {
+        running = setInterval(turn, document.querySelector("#interval").value);
+      }
+    });
+  </script>
+</body>
